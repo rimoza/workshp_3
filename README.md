@@ -1,0 +1,358 @@
+# Hospital Surgical Unit Simulation
+
+A discrete-event simulation of a hospital surgical unit using process-based modeling with blocking. This project simulates patient flow through preparation, operation, and recovery stages with limited resources and analyzes system performance under various configurations.
+
+## Overview
+
+This simulation models a surgical unit where patients arrive, undergo preparation, surgery, and recovery. The system includes resource constraints and blocking mechanisms that realistically represent hospital operations. The simulation supports multiple replications, sensitivity analysis, and scenario comparison.
+
+## Features
+
+- **Process-based simulation** using SimPy
+- **Blocking mechanisms** when resources are full
+- **Multiple replications** for statistical confidence
+- **Warmup period** to eliminate initialization bias
+- **Comprehensive metrics** including throughput time, blocking probability, and resource utilization
+- **Sensitivity analysis** for resource capacity optimization
+- **Scenario comparison** for different operational conditions
+- **Rich visualizations** with confidence intervals
+- **Configurable parameters** for flexible experimentation
+
+## Project Structure
+
+```
+workshop_2/
+├── main.py                  # Main entry point for running the simulation study
+├── simulation_runner.py     # Core simulation execution and replication management
+├── config.py               # Configuration parameters and scenario definitions
+├── hospital_system.py      # Hospital system model with resources and processes
+├── patient.py              # Patient entity class
+├── results_analyzer.py     # Statistical analysis and metric calculation
+├── visualizations.py       # Plotting and visualization functions
+├── requirements.txt        # Python dependencies
+├── output/                 # Output directory for results and plots
+│   ├── baseline_results.csv
+│   └── plots/
+│       ├── baseline/
+│       ├── sensitivity/
+│       └── comparison/
+└── README.md
+```
+
+## System Model
+
+### Patient Flow
+1. **Arrival**: Patients arrive according to exponential interarrival times
+2. **Preparation**: Patient undergoes preparation in a preparation room
+3. **Operation**: Surgery is performed in an operating theatre
+4. **Recovery**: Patient recovers in a recovery room
+5. **Departure**: Patient leaves the system
+
+### Resources
+- **Preparation Rooms**: Default 3 rooms
+- **Operating Theatres**: Default 1 theatre
+- **Recovery Rooms**: Default 3 rooms
+
+### Blocking
+- Patients are blocked from moving to the next stage if no resources are available
+- Blocked patients occupy current resources until space becomes available
+- System tracks blocking probability as a key performance metric
+
+## Installation
+
+### Prerequisites
+- Python 3.7 or higher
+- pip package manager
+
+### Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+Required packages:
+- simpy>=4.0.1 (Discrete-event simulation framework)
+- numpy>=1.21.0 (Numerical computations)
+- pandas>=1.3.0 (Data analysis and manipulation)
+- matplotlib>=3.4.0 (Plotting and visualization)
+- seaborn>=0.11.0 (Statistical data visualization)
+- scipy>=1.7.0 (Statistical functions)
+
+## Usage
+
+### Running the Complete Simulation Study
+
+To run the full simulation study with baseline scenario, sensitivity analysis, and scenario comparison:
+
+```bash
+python main.py
+```
+
+This will:
+1. Run the baseline scenario (3 prep rooms, 1 theatre, 3 recovery rooms)
+2. Perform sensitivity analysis on recovery room capacity (1-5 rooms)
+3. Compare baseline, high load, and low load scenarios
+4. Generate all visualizations and save results to `output/`
+
+### Running Individual Components
+
+#### Baseline Scenario Only
+
+```python
+from config import ScenarioConfigs
+from simulation_runner import run_simulation_study
+from results_analyzer import print_aggregated_results
+
+config = ScenarioConfigs.baseline()
+results_df, summary, _ = run_simulation_study(config, verbose=True)
+print_aggregated_results(summary)
+```
+
+#### Custom Scenario
+
+```python
+from config import SimulationConfig
+from simulation_runner import run_simulation_study
+
+# Create custom configuration
+config = SimulationConfig()
+config.num_prep_rooms = 4
+config.num_operating_theatres = 2
+config.num_recovery_rooms = 5
+config.mean_interarrival = 20  # Increase patient arrival rate
+
+# Run simulation
+results_df, summary, _ = run_simulation_study(config, verbose=True)
+```
+
+#### Sensitivity Analysis
+
+```python
+from config import ScenarioConfigs
+from simulation_runner import run_sensitivity_analysis
+
+base_config = ScenarioConfigs.baseline()
+
+# Analyze effect of operating theatre capacity
+sensitivity_results = run_sensitivity_analysis(
+    base_config,
+    parameter_name='num_operating_theatres',
+    parameter_values=[1, 2, 3],
+    verbose=True
+)
+```
+
+## Configuration Parameters
+
+All parameters are configurable through the `SimulationConfig` class in `config.py`:
+
+### Resource Capacities
+- `num_prep_rooms`: Number of preparation rooms (default: 3)
+- `num_operating_theatres`: Number of operating theatres (default: 1)
+- `num_recovery_rooms`: Number of recovery rooms (default: 3)
+
+### Time Parameters (minutes)
+- `mean_interarrival`: Mean time between patient arrivals (default: 25)
+- `mean_prep_time`: Mean preparation time (default: 40)
+- `mean_operation_time`: Mean operation time (default: 20)
+- `mean_recovery_time`: Mean recovery time (default: 40)
+
+### Simulation Control
+- `sim_duration`: Total simulation time in minutes (default: 24 * 60 = 1440)
+- `warmup_period`: Warmup period in minutes (default: 8 * 60 = 480)
+- `num_replications`: Number of independent replications (default: 30)
+- `random_seed`: Base random seed for reproducibility (default: 42)
+- `monitoring_interval`: Time between system state snapshots (default: 60)
+
+## Performance Metrics
+
+The simulation calculates the following metrics:
+
+### Patient Flow Metrics
+- **Mean Throughput Time**: Average total time in system (preparation + operation + recovery + waiting)
+- **Mean Preparation Time**: Average time in preparation stage
+- **Mean Operation Time**: Average time in operation stage
+- **Mean Recovery Time**: Average time in recovery stage
+
+### Resource Utilization
+- **Mean Prep Room Utilization**: Average proportion of prep rooms in use
+- **Mean Theatre Utilization**: Average proportion of theatres in use
+- **Mean Recovery Room Utilization**: Average proportion of recovery rooms in use
+
+### Blocking Metrics
+- **Blocking Probability**: Proportion of times patients are blocked from progressing
+- **Mean Blocking Time**: Average time patients spend blocked
+
+### System Performance
+- **Total Patients Arrived**: Total number of patient arrivals
+- **Total Patients Departed**: Total number of patients who completed the process
+- **Patients in System**: Current number of patients in the system
+
+All metrics include:
+- Mean across replications
+- Standard deviation
+- 95% confidence intervals (t-distribution based)
+- Sample size (number of replications)
+
+## Output
+
+### CSV Files
+Results are saved to `output/` directory:
+- `baseline_results.csv`: Detailed metrics for each replication of baseline scenario
+
+### Plots
+Visualizations are saved to `output/plots/`:
+
+#### Baseline Plots (`output/plots/baseline/`)
+- Throughput time distribution with histogram and KDE
+- Resource utilization comparison
+- Blocking probability analysis
+- Confidence interval plots for all key metrics
+
+#### Sensitivity Analysis (`output/plots/sensitivity/`)
+- Throughput time vs. parameter value
+- Blocking probability vs. parameter value
+- Shows trend lines with confidence intervals
+
+#### Scenario Comparison (`output/plots/comparison/`)
+- Side-by-side bar charts comparing scenarios
+- Multiple metrics in one plot
+- Error bars showing confidence intervals
+
+## Examples
+
+### Example 1: Quick Baseline Run
+
+```python
+from config import ScenarioConfigs
+from simulation_runner import run_simulation_study
+
+# Run baseline with 10 replications (faster)
+config = ScenarioConfigs.baseline()
+config.num_replications = 10
+
+results_df, summary, _ = run_simulation_study(config)
+print(f"Mean throughput: {summary['mean_throughput_time']['mean']:.2f} minutes")
+print(f"Blocking prob: {summary['blocking_probability']['mean']:.4f}")
+```
+
+### Example 2: Test Hospital Expansion
+
+```python
+from config import SimulationConfig
+from simulation_runner import compare_scenarios
+
+# Current configuration
+current = SimulationConfig()
+current.num_operating_theatres = 1
+current.num_recovery_rooms = 3
+
+# Proposed expansion
+expanded = SimulationConfig()
+expanded.num_operating_theatres = 2
+expanded.num_recovery_rooms = 5
+
+# Compare
+results = compare_scenarios(
+    [current, expanded],
+    ['Current', 'Expanded'],
+    verbose=True
+)
+```
+
+### Example 3: Find Optimal Recovery Room Count
+
+```python
+from config import ScenarioConfigs
+from simulation_runner import run_sensitivity_analysis
+
+config = ScenarioConfigs.baseline()
+
+results = run_sensitivity_analysis(
+    config,
+    'num_recovery_rooms',
+    [1, 2, 3, 4, 5, 6, 7],
+    verbose=True
+)
+
+# Find configuration with blocking < 0.01
+for rooms, data in results.items():
+    blocking = data['summary']['blocking_probability']['mean']
+    if blocking < 0.01:
+        print(f"Optimal: {rooms} recovery rooms (blocking: {blocking:.4f})")
+        break
+```
+
+## Methodology
+
+### Simulation Approach
+- **Discrete-Event Simulation**: Time advances in discrete jumps as events occur
+- **Process-Based Modeling**: Each patient is modeled as a process moving through stages
+- **Blocking with Before-Service**: Patients occupy resources while blocked
+
+### Statistical Considerations
+- **Multiple Replications**: 30 independent runs for statistical reliability
+- **Warmup Period**: 8-hour warmup to reach steady-state
+- **Confidence Intervals**: 95% CIs using t-distribution
+- **Seeded Random Numbers**: Reproducible results with configurable seeds
+
+### Validation
+- Patient conservation: Arrivals = Departures + In-system
+- Utilization bounds: 0 <= utilization <= 1
+- Blocking logic: Proper queue management and resource allocation
+
+## Troubleshooting
+
+### Common Issues
+
+**Issue**: No results generated
+- **Solution**: Check that warmup period is not too long for simulation duration
+- Ensure at least some patients complete the system after warmup
+
+**Issue**: High variance in results
+- **Solution**: Increase number of replications
+- Extend simulation duration
+- Check for transient effects by adjusting warmup period
+
+**Issue**: Unrealistic utilization values
+- **Solution**: Verify service time parameters are reasonable
+- Check resource capacity settings
+- Ensure arrival rate matches system capacity
+
+## Authors
+
+- **Group Q** - Primary Developers
+
+## Course Information
+
+**Course**: Deep Learning for Cognitive Computing - Simulation Assignment 2
+**Institution**: University of Jyväskylä
+**Date**: 2025
+
+## License
+
+This project is developed for academic purposes as part of coursework.
+
+## Acknowledgments
+
+- SimPy documentation and community
+- Course instructors and teaching assistants
+- Discrete-event simulation theory from course materials
+
+## References
+
+- Banks, J., Carson, J. S., Nelson, B. L., & Nicol, D. M. (2010). Discrete-Event System Simulation. Pearson.
+- SimPy Documentation: https://simpy.readthedocs.io/
+- Law, A. M., & Kelton, W. D. (2000). Simulation Modeling and Analysis. McGraw-Hill.
+
+## Future Enhancements
+
+Potential extensions to the simulation:
+- Patient priority levels (emergency vs. scheduled)
+- Staff resources (surgeons, nurses)
+- Equipment failures and maintenance
+- Different surgical procedure types with varying durations
+- Real-time visualization of system state
+- Optimization algorithms for resource allocation
+- Cost analysis and budget constraints
+- Patient rescheduling and cancellation policies
