@@ -325,7 +325,7 @@ for rooms, data in results.items():
 
 ## Course Information
 
-**Course**: Deep Learning for Cognitive Computing - Simulation Assignment 2
+**Course**: Simulation - Assignment 2
 **Institution**: University of Jyväskylä
 **Date**: 2025
 
@@ -356,3 +356,4 @@ Potential extensions to the simulation:
 - Optimization algorithms for resource allocation
 - Cost analysis and budget constraints
 - Patient rescheduling and cancellation policies
+
