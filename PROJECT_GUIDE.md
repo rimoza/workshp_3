@@ -623,7 +623,7 @@ python main.py
 ======================================================================
 HOSPITAL SIMULATION STUDY
 Process-Based Simulation with Blocking
-Author: Ridwan
+Author: Group Q work
 ======================================================================
 
 [1/3] Running baseline scenario...

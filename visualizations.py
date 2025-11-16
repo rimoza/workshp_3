@@ -1,6 +1,6 @@
 """
 Visualization functions for simulation results
-Author: Ridwan
+Author: Group Q work
 Course: Deep Learning for Cognitive Computing - Simulation Assignment 2
 """
 

@@ -1,6 +1,6 @@
 """
 Main simulation execution with multiple replications
-Author: Ridwan
+Author: Group Q work
 Course: Deep Learning for Cognitive Computing - Simulation Assignment 2
 """
 

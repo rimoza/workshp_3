@@ -1,6 +1,6 @@
 """
 Hospital system with resource pools and patient processes
-Author: Ridwan
+Author: Group Q work
 Course: Deep Learning for Cognitive Computing - Simulation Assignment 2
 """
 
