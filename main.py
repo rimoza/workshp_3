@@ -30,8 +30,8 @@ def run_baseline_scenario():
     results_df.to_csv('output/baseline_results.csv', index=False)
     print("Results saved to: output/baseline_results.csv")
     
-    # Create visualizations
-    create_all_plots(results_df, summary, output_dir='output/plots/baseline')
+    # Create visualizations (set interactive=True to show navigation buttons)
+    create_all_plots(results_df, summary, output_dir='output/plots/baseline', interactive=True)
     
     return results_df, summary
 
