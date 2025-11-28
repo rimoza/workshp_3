@@ -48,6 +48,37 @@ workshop_2/
 4. **Recovery**: Patient recovers in a recovery room
 5. **Departure**: Patient leaves the system
 
+### Process Flow Diagram
+```
+Patient Arrival → Preparation Room → Operating Theatre → Recovery Room → Departure
+       ↓              ↓                    ↓ (Blocking)         ↓
+   Generator      Request/Release      Request/Release    Request/Release
+   Process        Resource Pool        Resource Pool      Resource Pool
+```
+
+**Sequence Diagram Reference:**
+```
+Patient Generator → Hospital System: Generate patient
+Hospital System → Patient: Create patient process
+Patient → Prep Pool: Request prep room
+Prep Pool → Patient: Grant prep room
+Patient → Patient: Preparation time
+Patient → Prep Pool: Release prep room
+Patient → Theatre: Request theatre
+Theatre → Patient: Grant theatre
+Patient → Patient: Operation time
+Patient → Recovery Pool: Request recovery room
+Recovery Pool → Patient: Recovery room full? (BLOCKING)
+Patient → Theatre: Stay in theatre (blocked)
+Recovery Pool → Patient: Grant recovery room
+Patient → Theatre: Release theatre
+Patient → Patient: Recovery time
+Patient → Recovery Pool: Release recovery room
+Patient → Hospital System: Departure
+```
+
+For a visual sequence diagram, see `docs/sequence_diagram.png` (to be added).
+
 ### Resources
 - **Preparation Rooms**: Default 3 rooms
 - **Operating Theatres**: Default 1 theatre

@@ -170,15 +170,11 @@ class HospitalSystem:
                 })
                 
                 # Theatre queue
-                theatre_blocked = 1 if (self.theatre.count > 0 and 
-                                       self.recovery_pool.count >= self.recovery_pool.capacity) else 0
-                
                 self.theatre_queue_data.append({
                     'time': self.env.now,
                     'queue_length': len(self.theatre.queue),
                     'in_service': self.theatre.count,
-                    'utilization': self.theatre.count / self.theatre.capacity,
-                    'blocked': theatre_blocked
+                    'utilization': self.theatre.count / self.theatre.capacity
                 })
                 
                 # Recovery queue
