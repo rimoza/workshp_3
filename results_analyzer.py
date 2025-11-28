@@ -67,6 +67,12 @@ class SimulationResults:
         sim_time = self.config.sim_duration - self.config.warmup_period
         metrics['theatre_blocked_time'] = self.hospital.theatre_blocked_time
         metrics['theatre_blocked_fraction'] = self.hospital.theatre_blocked_time / sim_time if sim_time > 0 else 0
+
+        # 4. All Recovery Rooms Busy Probability (Assignment 3)
+        if self.hospital.monitoring_intervals_count > 0:
+            metrics['all_recovery_busy_probability'] = self.hospital.all_recovery_busy_count / self.hospital.monitoring_intervals_count
+        else:
+            metrics['all_recovery_busy_probability'] = 0
         
         # 4. Patient counts
         metrics['num_patients_completed'] = total_operations

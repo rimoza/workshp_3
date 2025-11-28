@@ -19,7 +19,7 @@ class Patient:
     def __init__(self, env, config):
         """
         Initialize a new patient with individual service times.
-        
+
         Args:
             env: SimPy environment
             config: SimulationConfig object
@@ -27,12 +27,24 @@ class Patient:
         # Assign unique ID
         Patient.patient_counter += 1
         self.id = Patient.patient_counter
-        
+
         self.env = env
-        
+
+        # Determine patient type (for personal twist)
+        if config.enable_patient_types:
+            self.patient_type = 'emergency' if random.random() < config.emergency_probability else 'regular'
+        else:
+            self.patient_type = 'regular'
+
         # Generate individual service times using exponential distribution
         self.prep_time = random.expovariate(1.0 / config.mean_prep_time)
-        self.operation_time = random.expovariate(1.0 / config.mean_operation_time)
+
+        # Operation time depends on patient type
+        base_operation_time = config.mean_operation_time
+        if self.patient_type == 'emergency':
+            base_operation_time *= config.emergency_operation_multiplier
+        self.operation_time = random.expovariate(1.0 / base_operation_time)
+
         self.recovery_time = random.expovariate(1.0 / config.mean_recovery_time)
         
         # Initialize all timestamps to None
@@ -78,6 +90,7 @@ class Patient:
         
         return {
             'patient_id': self.id,
+            'patient_type': self.patient_type,
             'arrival_time': self.arrival_time,
             'prep_start': self.prep_start,
             'prep_end': self.prep_end,

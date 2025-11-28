@@ -33,9 +33,9 @@ class SimulationConfig:
         # ============================================
         # Simulation Control Parameters
         # ============================================
-        self.sim_duration = 24 * 60    # 24 hours in minutes
-        self.warmup_period = 8 * 60    # 8 hours warmup period
-        self.num_replications = 30     # Number of independent replications
+        self.sim_duration = 24 * 60    # 24 hours in minutes (can be overridden for Assignment 3)
+        self.warmup_period = 8 * 60    # 8 hours warmup period (can be overridden for Assignment 3)
+        self.num_replications = 30     # Number of independent replications (can be overridden for Assignment 3)
         self.random_seed = 42          # Base random seed for reproducibility
         
         # Monitoring interval (minutes)
@@ -49,6 +49,13 @@ class SimulationConfig:
         self.prep_dist = 'exponential'
         self.operation_dist = 'exponential'
         self.recovery_dist = 'exponential'
+
+        # ============================================
+        # Personal Twist: Patient Types (Assignment 3)
+        # ============================================
+        self.enable_patient_types = False  # Enable different patient types
+        self.emergency_probability = 0.2   # Probability of emergency patient
+        self.emergency_operation_multiplier = 2.0  # Emergency operation time multiplier
         
     def get_scenario_name(self):
         """Generate a descriptive name for the current configuration"""
@@ -120,4 +127,56 @@ class ScenarioConfigs:
         """Low patient load scenario"""
         config = SimulationConfig()
         config.mean_interarrival = 40  # Fewer patients
+        return config
+
+    # ============================================
+    # Assignment 3 Configurations
+    # ============================================
+
+    @staticmethod
+    def assignment3_base():
+        """Base configuration for Assignment 3"""
+        config = SimulationConfig()
+        # Assignment 3 parameters
+        config.sim_duration = 1000  # 1000 time units
+        config.warmup_period = 200  # Warmup period for equilibrium
+        config.num_replications = 20  # 20 independent samples
+        config.monitoring_interval = 10  # More frequent monitoring
+        return config
+
+    @staticmethod
+    def assignment3_3p4r():
+        """Assignment 3: 3 preparation rooms, 4 recovery rooms"""
+        config = ScenarioConfigs.assignment3_base()
+        config.num_prep_rooms = 3
+        config.num_recovery_rooms = 4
+        return config
+
+    @staticmethod
+    def assignment3_3p5r():
+        """Assignment 3: 3 preparation rooms, 5 recovery rooms"""
+        config = ScenarioConfigs.assignment3_base()
+        config.num_prep_rooms = 3
+        config.num_recovery_rooms = 5
+        return config
+
+    @staticmethod
+    def assignment3_4p5r():
+        """Assignment 3: 4 preparation rooms, 5 recovery rooms"""
+        config = ScenarioConfigs.assignment3_base()
+        config.num_prep_rooms = 4
+        config.num_recovery_rooms = 5
+        return config
+
+    @staticmethod
+    def assignment3_personal_twist():
+        """Assignment 3: Personal twist - mixed patient types with adjusted interarrival"""
+        config = ScenarioConfigs.assignment3_base()
+        config.enable_patient_types = True
+        # Adjust interarrival to maintain same theatre utilization
+        # Expected operation time = 0.8*20 + 0.2*40 = 24 min
+        # Original expected = 20 min, so interarrival = 25 * (24/20) = 30
+        config.mean_interarrival = 30
+        config.num_prep_rooms = 3
+        config.num_recovery_rooms = 4  # Use 3p4r as base
         return config

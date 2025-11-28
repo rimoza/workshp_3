@@ -47,6 +47,10 @@ class HospitalSystem:
         self.theatre_queue_data = []
         self.recovery_queue_data = []
         self.theatre_utilization_data = []
+
+        # Assignment 3 specific monitoring
+        self.all_recovery_busy_count = 0  # Count of monitoring intervals when all recovery rooms are busy
+        self.monitoring_intervals_count = 0  # Total monitoring intervals
         
         # For tracking current state
         self.total_patients_arrived = 0
@@ -158,9 +162,15 @@ class HospitalSystem:
         """
         while True:
             yield self.env.timeout(self.config.monitoring_interval)
-            
+
             # Only collect data after warmup period
             if self.env.now > self.config.warmup_period:
+                self.monitoring_intervals_count += 1
+
+                # Check if all recovery rooms are busy
+                if self.recovery_pool.count >= self.recovery_pool.capacity:
+                    self.all_recovery_busy_count += 1
+
                 # Preparation queue
                 self.prep_queue_data.append({
                     'time': self.env.now,
@@ -168,7 +178,7 @@ class HospitalSystem:
                     'in_service': self.prep_pool.count,
                     'utilization': self.prep_pool.count / self.prep_pool.capacity
                 })
-                
+
                 # Theatre queue
                 self.theatre_queue_data.append({
                     'time': self.env.now,
@@ -176,7 +186,7 @@ class HospitalSystem:
                     'in_service': self.theatre.count,
                     'utilization': self.theatre.count / self.theatre.capacity
                 })
-                
+
                 # Recovery queue
                 self.recovery_queue_data.append({
                     'time': self.env.now,

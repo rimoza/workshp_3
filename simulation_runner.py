@@ -195,3 +195,76 @@ def compare_scenarios(scenario_configs, scenario_names=None, verbose=True):
         }
     
     return comparison_results
+
+
+def run_pairwise_comparison(config1, config2, num_replications=20, verbose=True):
+    """
+    Run pairwise comparison using the same random seeds for both configurations.
+
+    Args:
+        config1: First SimulationConfig object
+        config2: Second SimulationConfig object
+        num_replications: Number of replications
+        verbose: Boolean, print progress if True
+
+    Returns:
+        dict: Results for both configurations and differences
+    """
+    if verbose:
+        print(f"\n{'='*60}")
+        print("PAIRWISE COMPARISON")
+        print(f"Config 1: {config1.get_scenario_name()}")
+        print(f"Config 2: {config2.get_scenario_name()}")
+        print(f"Replications: {num_replications}")
+        print(f"{'='*60}\n")
+
+    results1 = []
+    results2 = []
+    differences = []
+
+    for rep in range(num_replications):
+        if verbose and (rep + 1) % 5 == 0:
+            print(f"Progress: {rep + 1}/{num_replications} replications completed")
+
+        # Run both configs with same seed
+        seed = config1.random_seed + rep
+
+        # Config 1
+        config1_rep = config1.__class__()
+        for key, val in config1.__dict__.items():
+            setattr(config1_rep, key, val)
+        config1_rep.random_seed = seed
+
+        metrics1, _ = run_single_replication(config1_rep, rep, verbose=False)
+        if metrics1:
+            results1.append(metrics1)
+
+        # Config 2
+        config2_rep = config2.__class__()
+        for key, val in config2.__dict__.items():
+            setattr(config2_rep, key, val)
+        config2_rep.random_seed = seed
+
+        metrics2, _ = run_single_replication(config2_rep, rep, verbose=False)
+        if metrics2:
+            results2.append(metrics2)
+
+        # Calculate differences
+        if metrics1 and metrics2:
+            diff = {}
+            for key in metrics1.keys():
+                if key in metrics2 and key != 'replication_id':
+                    diff[key] = metrics1[key] - metrics2[key]
+            diff['replication_id'] = rep
+            differences.append(diff)
+
+    # Aggregate results
+    results_df1, summary1 = aggregate_replication_results(results1)
+    results_df2, summary2 = aggregate_replication_results(results2)
+    diff_df, diff_summary = aggregate_replication_results(differences)
+
+    return {
+        'config1': {'results_df': results_df1, 'summary': summary1, 'config': config1},
+        'config2': {'results_df': results_df2, 'summary': summary2, 'config': config2},
+        'differences': {'results_df': diff_df, 'summary': diff_summary}
+    }
