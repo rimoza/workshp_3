@@ -128,13 +128,7 @@ For a visual sequence diagram, see `docs/sequence_diagram.png` (to be added).
 pip install -r requirements.txt
 ```
 
-Required packages:
-- simpy>=4.0.1 (Discrete-event simulation framework)
-- numpy>=1.21.0 (Numerical computations)
-- pandas>=1.3.0 (Data analysis and manipulation)
-- matplotlib>=3.4.0 (Plotting and visualization)
-- seaborn>=0.11.0 (Statistical data visualization)
-- scipy>=1.7.0 (Statistical functions)
+
 
 ## Usage
 
