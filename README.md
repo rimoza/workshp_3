@@ -1,5 +1,6 @@
 # Hospital Surgical Unit Simulation
 
+
 A discrete-event simulation of a hospital surgical unit using process-based modeling with blocking. This project simulates patient flow through preparation, operation, and recovery stages with limited resources and analyzes system performance under various configurations.
 
 **Current Version**: Assignment 3 - Enhanced with pairwise comparisons, mixed patient types, and advanced statistical analysis.
@@ -43,6 +44,8 @@ workshop_3/
 │       └── comparison/     # Scenario comparison plots
 └── README.md
 ```
+
+
 
 ## System Model
 
