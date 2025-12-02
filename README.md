@@ -1,4 +1,5 @@
 # Hospital Surgical Unit Simulation
+![hospital-operating-room-doctors-surgery-room-surgery-operation-icon-hospital-operating-room-doctors-surgery-room-surgery-102016286](https://github.com/user-attachments/assets/3e06b868-44b5-40d9-9097-dc7507b4d2e6)
 
 
 A discrete-event simulation of a hospital surgical unit using process-based modeling with blocking. This project simulates patient flow through preparation, operation, and recovery stages with limited resources and analyzes system performance under various configurations.
